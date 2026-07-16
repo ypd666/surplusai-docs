@@ -1,0 +1,167 @@
+import { SystemCommand, SystemContent } from '@rspress/core/theme';
+
+# Codex CLI & Desktop 接入
+
+接入前，请先在 SurplusToken 平台[创建 API 密钥](/platform/create-api-key)。
+
+页面会根据右上角选择的系统显示对应流程。不同系统不仅命令可以不同，完整的标题、说明和步骤也可以不同。
+
+## 安装 Codex CLI
+
+<SystemContent system="windows">
+
+### 使用 WSL2 安装
+
+Windows 用户建议在 WSL2 中运行 Codex。这样可以使用 Linux 原生开发工具，并减少 Windows 与 Unix 命令、权限和路径之间的差异。
+
+首先以管理员身份打开 PowerShell 或 Windows Terminal，安装 WSL：
+
+```powershell
+wsl --install
+```
+
+安装完成后重启电脑，打开 Ubuntu，并完成 Linux 用户名和密码设置。
+
+然后在 WSL 终端中安装 Codex：
+
+```bash
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+```
+
+检查安装结果：
+
+```bash
+codex --version
+```
+
+建议将项目放在 WSL 的 Linux 主目录下，例如 `~/code`，不要放在 `/mnt/c` 下，以获得更好的文件读写和权限兼容性。
+
+```bash
+mkdir -p ~/code
+cd ~/code
+```
+
+> WSL1 已不再受新版 Codex 支持，请使用 WSL2。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+### 在 macOS 中安装
+
+打开 Terminal，运行官方安装脚本：
+
+```bash
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+```
+
+也可以使用 Homebrew：
+
+```bash
+brew install --cask codex
+```
+
+检查安装结果：
+
+```bash
+codex --version
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+### 在 Linux 中安装
+
+打开终端，运行官方安装脚本：
+
+```bash
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+```
+
+检查安装结果：
+
+```bash
+codex --version
+```
+
+</SystemContent>
+
+## 配置连接
+
+按照 SurplusToken 平台提供的接入地址和密钥配置 Codex。请使用环境变量或客户端配置文件保存密钥，不要把密钥写入项目源码。
+
+<SystemContent system="windows">
+
+Windows 流程中的 Codex 运行在 WSL 内，因此请在 WSL 终端设置 Linux 环境变量：
+
+```bash
+export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+```
+
+需要永久保存时，将环境变量加入 `~/.bashrc`：
+
+```bash
+echo 'export OPENAI_API_KEY="你的 SurplusToken API 密钥"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+在 Terminal 中设置环境变量：
+
+```bash
+export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+```
+
+需要永久保存时，将环境变量加入 `~/.zshrc`。
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+在 Shell 中设置环境变量：
+
+```bash
+export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+```
+
+需要永久保存时，根据使用的 Shell 将环境变量加入 `~/.bashrc` 或 `~/.zshrc`。
+
+</SystemContent>
+
+## 启动 Codex
+
+进入项目目录后运行：
+
+<SystemCommand windows="codex" macos="codex" linux="codex" />
+
+首次启动时，按照终端提示完成登录或鉴权。
+
+## Codex Desktop
+
+<SystemContent system="windows">
+
+Windows 可以安装 Codex Desktop。使用 WSL 项目时，在应用设置中将 Agent Environment 配置为 Windows Subsystem for Linux，并选择实际用于开发的 WSL2 发行版。
+
+打开项目时，优先选择 `\\wsl$\Ubuntu\home\<用户名>\code` 下的目录。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+macOS 可以直接安装并运行 Codex Desktop。打开应用后选择项目目录，再按照 SurplusToken 平台提供的信息配置接入地址和 API 密钥。
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+Linux 用户请使用 Codex CLI。Codex Desktop 当前面向 Windows 和 macOS 提供。
+
+</SystemContent>
+
+:::tip
+右上角的系统选择会同步更新本页所有系统专属内容，并在刷新和页面跳转后保留。
+:::

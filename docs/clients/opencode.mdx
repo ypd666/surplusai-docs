@@ -1,0 +1,29 @@
+import { SystemCommand } from '@rspress/core/theme';
+
+# OpenCode 接入
+
+## 安装 OpenCode
+
+选择系统后运行对应命令：
+
+<SystemCommand
+  windows="npm install -g opencode-ai"
+  macos="brew install anomalyco/tap/opencode"
+  linux="curl -fsSL https://opencode.ai/install | bash"
+/>
+
+安装完成后检查版本：
+
+<SystemCommand
+  windows="opencode --version"
+  macos="opencode --version"
+  linux="opencode --version"
+/>
+
+## 配置 SurplusToken
+
+在 OpenCode 的 Provider 配置中填写 SurplusToken 提供的接入地址和 API 密钥。建议为 OpenCode 单独创建密钥，便于统计用量和单独撤销。
+
+配置完成后启动 OpenCode：
+
+<SystemCommand windows="opencode" macos="opencode" linux="opencode" />

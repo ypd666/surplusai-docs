@@ -1,5 +1,3 @@
-/* Example brand color overrides for the custom theme scaffold. */
-/* For more CSS variables, see https://rspress.rs/ui/vars. */
 :root {
   --rp-c-brand: #ff5e00;
   --rp-c-brand-dark: #ff704d;
@@ -9,4 +7,153 @@
   --rp-c-brand-tint: rgba(255, 94, 0, 0.07);
 
   --rp-home-hero-secondary-color: #ff5e00;
+}
+
+.system-selector {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.system-selector--content {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 20px 0 28px;
+  padding: 16px;
+  border: 1px solid var(--rp-c-divider);
+  border-radius: 8px;
+  background: var(--rp-c-bg-soft);
+  white-space: normal;
+}
+
+.system-selector__intro {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.system-selector__title {
+  color: var(--rp-c-text-1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.system-selector__description {
+  color: var(--rp-c-text-2);
+  font-size: 13px;
+}
+
+.system-selector__trigger {
+  width: 140px;
+  min-width: 140px;
+  height: 40px !important;
+  padding: 0 10px;
+  border-color: var(--rp-c-divider-light);
+  border-radius: var(--rp-radius-small);
+  color: var(--rp-c-text-1);
+  background-color: color-mix(in srgb, var(--rp-c-bg) 30%, transparent);
+  backdrop-filter: blur(25px);
+  box-shadow: none;
+  font-size: 13px;
+  transition: border-color 0.3s;
+}
+
+.system-selector__trigger:hover {
+  border-color: var(--rp-c-brand);
+}
+
+.system-selector__trigger--content {
+  width: auto;
+  min-width: 148px;
+  height: 36px !important;
+  background: var(--rp-c-bg);
+}
+
+.system-selector__content {
+  min-width: 148px;
+  border-color: var(--rp-c-divider);
+}
+
+.system-selector__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.system-selector__value svg {
+  width: 16px;
+  height: 16px;
+}
+
+.system-command {
+  overflow: hidden;
+  margin: 16px 0;
+  border: 1px solid var(--rp-c-divider);
+  border-radius: 6px;
+  background: var(--rp-code-block-bg);
+}
+
+.system-command__header {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--rp-c-divider);
+  color: var(--rp-c-text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.system-command__code {
+  overflow-x: auto;
+  margin: 0;
+  padding: 14px;
+  background: transparent;
+}
+
+.system-command__code code {
+  color: var(--rp-code-title-text);
+  font-family: var(--rp-font-family-mono);
+  font-size: 14px;
+}
+
+.system-content {
+  display: flow-root;
+}
+
+@media (max-width: 768px) {
+  .system-selector {
+    display: inline-flex;
+  }
+
+  .system-selector--content {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-left: 0;
+  }
+
+  .system-selector:not(.system-selector--content) .system-selector__trigger {
+    width: 52px;
+    min-width: 52px;
+    height: 40px !important;
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+  }
+
+  .system-selector:not(.system-selector--content)
+    .system-selector__value-label {
+    display: none;
+  }
+
+  .system-selector:not(.system-selector--content) .system-selector__value svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .system-selector__trigger--content {
+    width: 100%;
+    min-height: 44px;
+  }
 }
