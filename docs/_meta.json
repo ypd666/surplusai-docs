@@ -1,0 +1,27 @@
+[
+  {
+    "type": "dir-section-header",
+    "name": "start",
+    "label": "开始"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "platform",
+    "label": "平台功能"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "clients",
+    "label": "客户端接入"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "tools",
+    "label": "辅助工具"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "faq",
+    "label": "常见问题"
+  }
+]

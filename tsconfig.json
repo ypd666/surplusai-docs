@@ -11,6 +11,10 @@
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
@@ -21,7 +25,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["docs", "theme", "rspress.config.ts"],
+  "include": ["docs", "src", "theme", "rspress.config.ts"],
   "mdx": {
     "checkMdx": true
   }

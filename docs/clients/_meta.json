@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "codex",
+    "label": "Codex CLI & Desktop 接入"
+  },
+  {
+    "type": "file",
+    "name": "opencode",
+    "label": "OpenCode 接入"
+  }
+]
