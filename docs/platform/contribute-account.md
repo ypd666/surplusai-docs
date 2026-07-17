@@ -20,7 +20,7 @@
 - 确认账号符合平台当前的贡献条件。
 
 
-不要向他人发送账号密码、验证码、Cookie、Refresh Token、Access Token 或完整 OAuth 回调地址。
+不要向他人发送账号密码、验证码、Cookie、Refresh Token、Access Token；完整 OAuth 回调地址也不要对外分享，但需要在 SurplusToken 官方页面回填。
 
 ## 第一步：进入账号池
 
