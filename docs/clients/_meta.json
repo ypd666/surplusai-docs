@@ -6,6 +6,11 @@
   },
   {
     "type": "file",
+    "name": "claude-code",
+    "label": "Claude Code 接入"
+  },
+  {
+    "type": "file",
     "name": "kimi-code",
     "label": "Kimi Code 接入"
   },

@@ -1,29 +1,293 @@
-import { SystemCommand } from '@rspress/core/theme';
+import { SystemContent, SystemSelector } from '@rspress/core/theme';
 
 # OpenCode 接入
 
-## 安装 OpenCode
+本教程介绍如何下载安装 OpenCode，并使用名为 `surplustoken` 的自定义 Provider 接入 GPT 模型。
 
-选择系统后运行对应命令：
+<SystemSelector variant="content" />
 
-<SystemCommand
-  windows="npm install -g opencode-ai"
-  macos="brew install anomalyco/tap/opencode"
-  linux="curl -fsSL https://opencode.ai/install | bash"
-/>
+:::warning 密钥安全
+不要把 API Key 直接写入 `opencode.json`、项目源码或 Git 仓库。下文使用 OpenCode 的 `/connect` 流程保存凭证。
+:::
 
-安装完成后检查版本：
+## 开始前准备
 
-<SystemCommand
-  windows="opencode --version"
-  macos="opencode --version"
-  linux="opencode --version"
-/>
+1. 登录 [SurplusToken](https://surplustoken.com)。
+2. 在平台中[创建 API 密钥](/platform/create-api-key)。
+3. 选择支持 OpenCode 和目标 GPT 模型的分组，并阅读对应的[分组说明](/groups/)。
+4. 记录平台显示的准确模型 ID。本教程以 `gpt-5.6-sol` 为例。
 
-## 配置 SurplusToken
+SurplusToken 的 OpenAI 兼容 Base URL 为：
 
-在 OpenCode 的 Provider 配置中填写 SurplusToken 提供的接入地址和 API 密钥。建议为 OpenCode 单独创建密钥，便于统计用量和单独撤销。
+```text
+https://surplustoken.com/v1
+```
 
-配置完成后启动 OpenCode：
+## 1. 下载并安装 OpenCode
 
-<SystemCommand windows="opencode" macos="opencode" linux="opencode" />
+<SystemContent system="windows">
+
+### Windows
+
+OpenCode 官方推荐 Windows 用户使用 WSL2。在 Ubuntu 终端中运行：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+opencode --version
+```
+
+如需使用原生 Windows，并且已经安装 Node.js，可以打开 PowerShell：
+
+```powershell
+npm install -g opencode-ai
+opencode --version
+```
+
+也可以选择 Chocolatey 或 Scoop：
+
+```powershell
+choco install opencode
+```
+
+```powershell
+scoop install opencode
+```
+
+原生 Windows 与 WSL2 的配置和会话目录互不相同。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+### macOS
+
+打开 Terminal，运行官方安装脚本：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+opencode --version
+```
+
+也可以使用 Homebrew：
+
+```bash
+brew install anomalyco/tap/opencode
+opencode --version
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+### Linux
+
+打开终端，运行官方安装脚本：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+opencode --version
+```
+
+</SystemContent>
+
+## 2. 创建用户级 Provider 配置
+
+OpenCode 的用户级配置路径为：
+
+| 运行环境       | 配置文件                                       |
+| -------------- | ---------------------------------------------- |
+| Windows 原生   | `%USERPROFILE%\.config\opencode\opencode.json` |
+| Windows + WSL2 | `~/.config/opencode/opencode.json`             |
+| macOS          | `~/.config/opencode/opencode.json`             |
+| Linux          | `~/.config/opencode/opencode.json`             |
+
+<SystemContent system="windows">
+
+### Windows 原生环境
+
+在 PowerShell 中创建目录并打开配置：
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.config\opencode" | Out-Null
+notepad "$env:USERPROFILE\.config\opencode\opencode.json"
+```
+
+### Windows + WSL2
+
+在 Ubuntu 终端中运行：
+
+```bash
+mkdir -p ~/.config/opencode
+nano ~/.config/opencode/opencode.json
+```
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+在 Terminal 中运行：
+
+```bash
+mkdir -p ~/.config/opencode
+open -e ~/.config/opencode/opencode.json
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+在终端中运行：
+
+```bash
+mkdir -p ~/.config/opencode
+nano ~/.config/opencode/opencode.json
+```
+
+</SystemContent>
+
+写入以下配置：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "surplustoken/gpt-5.6-sol",
+  "provider": {
+    "surplustoken": {
+      "npm": "@ai-sdk/openai",
+      "name": "SurplusToken",
+      "options": {
+        "baseURL": "https://surplustoken.com/v1"
+      },
+      "models": {
+        "gpt-5.6-sol": {
+          "name": "GPT-5.6 Sol"
+        }
+      }
+    }
+  }
+}
+```
+
+这份配置会注册名为 `surplustoken` 的自定义 Provider，并默认选择 `surplustoken/gpt-5.6-sol`。该模型使用 Responses API，因此 Provider 包为 `@ai-sdk/openai`；不要改成仅面向 `/v1/chat/completions` 的配置。
+
+如果平台提供的模型 ID 不同，请同时修改 `model` 和 `models` 中的键。
+
+:::tip 配置优先级
+项目根目录中的 `opencode.json` 会覆盖冲突的用户级设置。若 `/models` 显示的 Provider 与本文不同，请检查项目配置和 `OPENCODE_CONFIG` 环境变量。
+:::
+
+## 3. 保存 SurplusToken API Key
+
+进入任意项目目录并启动 OpenCode：
+
+```bash
+opencode
+```
+
+然后：
+
+1. 输入 `/connect`。
+2. 滚动到底部并选择 **Other**。
+3. Provider ID 输入 `surplustoken`，必须与配置文件完全一致。
+4. 粘贴 SurplusToken API Key 并确认。
+
+OpenCode 会把凭证保存在用户数据目录的 `auth.json` 中，不需要把密钥写进 `opencode.json`。可以用以下命令检查已保存的 Provider：
+
+```bash
+opencode auth list
+```
+
+## 4. 选择模型并验证
+
+在 OpenCode 中输入：
+
+```text
+/models
+```
+
+选择 **SurplusToken → GPT-5.6 Sol**，然后发送：
+
+```text
+只回复“连接成功”，不要创建或修改任何文件。
+```
+
+配置成功应满足：
+
+- OpenCode 能正常回复；
+- 当前模型显示为 `surplustoken/gpt-5.6-sol`；
+- SurplusToken 控制台出现对应的用量记录。
+
+## 切换 Provider 后找回会话
+
+Provider 配置与本地会话是两类数据。切换 Provider 后，先回到原项目目录继续最近一次会话：
+
+```bash
+opencode --continue
+```
+
+如果知道会话 ID，可以运行：
+
+```bash
+opencode --session <SESSION_ID>
+```
+
+原生 Windows 与 WSL2 会读取不同的用户数据目录；从另一个环境启动时，原来的会话不会自动出现在当前环境。
+
+## 使用 Prompt 改为 SurplusToken Provider
+
+可以把以下 Prompt 交给 OpenCode，让它安全修改配置：
+
+````text
+请把当前用户级 OpenCode 配置切换到名为 surplustoken 的自定义 Provider。先确认当前环境实际读取的 ~/.config/opencode/opencode.json（Windows 原生通常为 %USERPROFILE%\.config\opencode\opencode.json），创建带时间戳的备份，并保留所有无关配置。添加或更新以下内容，确保最终 JSON/JSONC 语法合法：
+
+```json
+{
+  "model": "surplustoken/gpt-5.6-sol",
+  "provider": {
+    "surplustoken": {
+      "npm": "@ai-sdk/openai",
+      "name": "SurplusToken",
+      "options": {
+        "baseURL": "https://surplustoken.com/v1"
+      },
+      "models": {
+        "gpt-5.6-sol": {
+          "name": "GPT-5.6 Sol"
+        }
+      }
+    }
+  }
+}
+```
+
+不要读取、写入或显示 API Key，不要修改 auth.json。完成后展示不含敏感信息的变更摘要，并提醒我重启 OpenCode、运行 /connect 为 surplustoken 保存密钥，再用 /models 验证模型。
+````
+
+## 常见问题
+
+### 返回 401 Unauthorized
+
+- 运行 `opencode auth list`，确认存在 `surplustoken`；
+- 重新执行 `/connect`，Provider ID 必须为小写 `surplustoken`；
+- 确认 API Key 完整、有效且分组正确。
+
+### 返回 404 或模型不存在
+
+- 确认 `baseURL` 为 `https://surplustoken.com/v1`；
+- 确认模型 ID 与平台完全一致；
+- 确认使用 `@ai-sdk/openai` 访问 Responses API；
+- 确认 API Key 分组支持该模型。
+
+### 修改配置后没有生效
+
+- 完全退出并重新启动 OpenCode；
+- 检查项目根目录是否存在优先级更高的 `opencode.json`；
+- 检查是否设置了 `OPENCODE_CONFIG` 或 `OPENCODE_CONFIG_CONTENT`；
+- 运行 `/models` 查看实际加载的 Provider 和模型。
+
+## 参考资料
+
+- [OpenCode 安装说明](https://opencode.ai/docs/)
+- [OpenCode 配置文件](https://opencode.ai/docs/config/)
+- [OpenCode Provider 配置](https://opencode.ai/docs/providers/)
+- [OpenCode CLI 命令](https://opencode.ai/docs/cli/)

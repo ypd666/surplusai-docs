@@ -5,8 +5,7 @@
 ## 文档内容
 
 - **平台功能**：注册账号、创建密钥、充值和使用拼车。
-- **客户端接入**：配置 Codex CLI、Codex Desktop 和 OpenCode。
-- **辅助工具**：使用 Cockpit Tools 管理和排查客户端配置。
+- **客户端接入**：配置 Codex CLI、Codex Desktop、Claude Code、Kimi Code 和 OpenCode。
 
 ## 使用前准备
 

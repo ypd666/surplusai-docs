@@ -13,7 +13,6 @@ SurplusToken 文档由协作者共同维护。文档内容存放在
 | 入门和快速开始               | `docs/start/`         | [打开目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/start)          |
 | 平台账号、密钥、计费等功能   | `docs/platform/`      | [打开目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/platform)       |
 | Codex、OpenCode 等客户端接入 | `docs/clients/`       | [打开目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/clients)        |
-| 辅助工具                     | `docs/tools/`         | [打开目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/tools)          |
 | 常见问题                     | `docs/faq/`           | [打开目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/faq)            |
 | 文档图片                     | `docs/public/images/` | [打开公共资源目录](https://github.com/ypd666/surplusai-docs/tree/main/docs/public) |
 

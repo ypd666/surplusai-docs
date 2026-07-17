@@ -21,11 +21,6 @@
   },
   {
     "type": "dir-section-header",
-    "name": "tools",
-    "label": "辅助工具"
-  },
-  {
-    "type": "dir-section-header",
     "name": "faq",
     "label": "常见问题"
   },

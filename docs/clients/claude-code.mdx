@@ -1,0 +1,263 @@
+import { SystemContent, SystemSelector } from '@rspress/core/theme';
+
+# Claude Code 接入
+
+本教程介绍如何下载安装 Claude Code CLI，并通过 SurplusToken 的 Anthropic 兼容接口使用 Claude 模型。
+
+<SystemSelector variant="content" />
+
+:::warning 密钥安全
+API Key 等同于账号密码。不要把密钥写入项目配置、提交到 Git，或在截图、录屏和日志中展示完整内容。
+
+下文中的 `<SURPLUSTOKEN_API_KEY>` 和 `<CLAUDE_MODEL_ID>` 均为占位符。
+:::
+
+## 开始前准备
+
+1. 登录 [SurplusToken](https://surplustoken.com)。
+2. 在平台中[创建 API 密钥](/platform/create-api-key)。
+3. 选择明确支持 Claude Code 与目标 Claude 模型的分组。
+4. 在对应的[分组说明](/groups/)中确认倍率、模型 ID、额度和并发限制。
+
+:::info 分组不要混用
+Codex 教程使用的 `plus/team` 分组不代表一定适用于 Claude Code。请以 SurplusToken 控制台和具体分组文档显示的 Claude 模型支持情况为准。
+:::
+
+Claude Code 的网关 Base URL 填写为：
+
+```text
+https://surplustoken.com
+```
+
+这里不要追加 `/v1`；Claude Code 会自动请求 `/v1/messages`。
+
+## 1. 下载并安装 Claude Code
+
+<SystemContent system="windows">
+
+### Windows
+
+#### 方式一：原生 Windows
+
+打开 PowerShell，运行官方安装脚本：
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+claude --version
+```
+
+也可以使用 WinGet：
+
+```powershell
+winget install Anthropic.ClaudeCode
+claude --version
+```
+
+#### 方式二：WSL2
+
+在 Ubuntu 终端中运行：
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+claude --version
+```
+
+原生 Windows 与 WSL2 的配置和会话相互独立。在哪个环境运行 `claude`，就配置哪个环境。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+### macOS
+
+打开 Terminal，运行官方安装脚本：
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+claude --version
+```
+
+也可以使用 Homebrew：
+
+```bash
+brew install --cask claude-code
+claude --version
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+### Linux
+
+打开终端，运行官方安装脚本：
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+claude --version
+```
+
+</SystemContent>
+
+安装后可以运行 `claude doctor` 检查安装和更新状态。
+
+## 2. 配置 SurplusToken
+
+推荐通过当前终端的环境变量先完成验证，避免一开始就把密钥写入文件。
+
+<SystemContent system="windows">
+
+### Windows 原生环境
+
+打开 PowerShell：
+
+```powershell
+$env:ANTHROPIC_BASE_URL = "https://surplustoken.com"
+$env:ANTHROPIC_AUTH_TOKEN = Read-Host "SurplusToken API Key"
+$env:ANTHROPIC_MODEL = "<CLAUDE_MODEL_ID>"
+claude
+```
+
+退出 Claude Code 后清理当前终端中的密钥：
+
+```powershell
+Remove-Item Env:ANTHROPIC_AUTH_TOKEN
+```
+
+### Windows + WSL2
+
+在 Ubuntu 终端中运行：
+
+```bash
+export ANTHROPIC_BASE_URL="https://surplustoken.com"
+read -rsp "SurplusToken API Key: " ANTHROPIC_AUTH_TOKEN
+echo
+export ANTHROPIC_AUTH_TOKEN
+export ANTHROPIC_MODEL="<CLAUDE_MODEL_ID>"
+claude
+```
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+在 Terminal 中运行：
+
+```bash
+export ANTHROPIC_BASE_URL="https://surplustoken.com"
+read -rsp "SurplusToken API Key: " ANTHROPIC_AUTH_TOKEN
+echo
+export ANTHROPIC_AUTH_TOKEN
+export ANTHROPIC_MODEL="<CLAUDE_MODEL_ID>"
+claude
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+在终端中运行：
+
+```bash
+export ANTHROPIC_BASE_URL="https://surplustoken.com"
+read -rsp "SurplusToken API Key: " ANTHROPIC_AUTH_TOKEN
+echo
+export ANTHROPIC_AUTH_TOKEN
+export ANTHROPIC_MODEL="<CLAUDE_MODEL_ID>"
+claude
+```
+
+</SystemContent>
+
+`ANTHROPIC_AUTH_TOKEN` 会让 Claude Code 使用 `Authorization: Bearer` 发送 SurplusToken 密钥。`<CLAUDE_MODEL_ID>` 必须替换为当前分组支持的准确模型 ID。
+
+## 3. 持久保存非敏感配置
+
+可以把 Base URL 和模型写入用户级 `settings.json`，密钥继续由终端环境变量提供：
+
+| 运行环境       | 用户级配置                            |
+| -------------- | ------------------------------------- |
+| Windows 原生   | `%USERPROFILE%\.claude\settings.json` |
+| Windows + WSL2 | `~/.claude/settings.json`             |
+| macOS          | `~/.claude/settings.json`             |
+| Linux          | `~/.claude/settings.json`             |
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://surplustoken.com",
+    "ANTHROPIC_MODEL": "<CLAUDE_MODEL_ID>"
+  }
+}
+```
+
+:::warning
+不要把 API Key 写入项目中的 `.claude/settings.json`。如果把 `ANTHROPIC_AUTH_TOKEN` 写进用户级文件，它仍然是明文凭证；更安全的方式是在每次使用前通过终端或系统密钥管理工具注入。
+:::
+
+## 4. 启动并验证
+
+进入项目目录后启动：
+
+```bash
+cd /path/to/your/project
+claude
+```
+
+进入 Claude Code 后输入 `/status`，检查 Base URL、认证来源和模型，然后发送：
+
+```text
+只回复“连接成功”，不要创建或修改任何文件。
+```
+
+如果模型 ID 不正确，可输入 `/model` 查看可用选项，或按照分组文档更新 `ANTHROPIC_MODEL`。
+
+## 切换服务后找回历史会话
+
+更换 Base URL 或认证方式不会自动删除 Claude Code 的本地 CLI 会话。会话按项目目录保存，因此先回到原项目目录：
+
+```bash
+claude --resume
+```
+
+继续当前目录最近一次会话：
+
+```bash
+claude --continue
+```
+
+在会话选择器中按 `Ctrl+A` 可以显示本机所有项目的会话；已进入 Claude Code 时可输入 `/resume`。Claude Desktop、Web、VS Code 扩展和 CLI 各自维护会话历史，不能假定彼此可见。
+
+## 使用 Prompt 切换到 SurplusToken
+
+可以把下面的 Prompt 交给 Claude Code，让它安全更新用户级配置：
+
+```text
+请只修改当前运行环境的用户级 Claude Code 配置，不要修改项目配置。先确认用户级 ~/.claude/settings.json（Windows 原生为 %USERPROFILE%\.claude\settings.json）的实际路径并创建带时间戳的备份；保留所有无关字段，在 env 中添加或更新 ANTHROPIC_BASE_URL=https://surplustoken.com 和 ANTHROPIC_MODEL=<CLAUDE_MODEL_ID>。不要读取、写入或显示 API Key，不要把 ANTHROPIC_AUTH_TOKEN 写进配置文件。验证 JSON 语法后展示不含敏感信息的变更摘要，并提醒我在终端安全设置 ANTHROPIC_AUTH_TOKEN 后重启 Claude Code，使用 /status 验证。
+```
+
+## 常见问题
+
+### 返回 401 或认证失败
+
+- 确认设置的是 `ANTHROPIC_AUTH_TOKEN`，且密钥完整、未撤销；
+- 检查当前终端是否真的包含该环境变量；
+- 确认 API Key 分组支持 Claude Code；
+- 输入 `/status` 检查当前认证来源。
+
+### 返回 404 或模型不存在
+
+- `ANTHROPIC_BASE_URL` 应为 `https://surplustoken.com`，不要追加 `/v1/messages`；
+- 确认 `ANTHROPIC_MODEL` 与平台模型 ID 完全一致；
+- 确认密钥分组支持该模型。
+
+### 仍然走原来的 Claude 账号
+
+仅设置 Base URL 不等于替换认证。确认同一终端中已经设置 `ANTHROPIC_AUTH_TOKEN`，然后完全退出并重新启动 Claude Code。取消这些网关环境变量后，Claude Code 才会回到以前保存的登录方式。
+
+## 参考资料
+
+- [Claude Code 安装说明](https://code.claude.com/docs/en/installation)
+- [Claude Code LLM Gateway 配置](https://code.claude.com/docs/en/llm-gateway)
+- [Claude Code 会话管理](https://code.claude.com/docs/en/sessions)
+- [Claude Code 设置](https://code.claude.com/docs/en/settings)
