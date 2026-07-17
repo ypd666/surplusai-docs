@@ -1,58 +1,67 @@
-import { SystemCommand, SystemContent } from '@rspress/core/theme';
+import { SystemContent, SystemSelector } from '@rspress/core/theme';
 
-# Codex CLI & Desktop 接入
+# Codex CLI 与 Desktop 配置教程
 
-接入前，请先在 SurplusToken 平台[创建 API 密钥](/platform/create-api-key)。
+本教程说明如何使用 SurplusToken API Key 配置 Codex CLI 与 Codex Desktop，以及如何通过 Cockpit Tools 在多个 Codex 账号之间切换。
 
-页面会根据右上角选择的系统显示对应流程。不同系统不仅命令可以不同，完整的标题、说明和步骤也可以不同。
+<SystemSelector variant="content" />
 
-## 安装 Codex CLI
+:::warning 密钥安全
+API Key 等同于账号密码。不要把密钥发送给他人，也不要写入项目源码、提交到 Git，或出现在公开截图和日志中。
+
+本文已将默认模型配置为 `gpt-5.6-sol`，推理强度配置为 `high`。其中 `<SURPLUSTOKEN_API_KEY>` 是密钥占位符，请替换为你自己的 API Key。
+:::
+
+## 开始前准备
+
+开始前，请先完成以下操作：
+
+1. 登录 [SurplusToken](https://surplustoken.com)。
+2. 在平台中[创建 API 密钥](/platform/create-api-key)。
+3. 确认密钥绑定的分组支持 `gpt-5.6-sol` 模型。
+
+SurplusToken 的公网 API Base URL 为：
+
+```text
+https://surplustoken.com/v1
+```
+
+如果平台页面提供了校内专用地址，请以页面显示的地址为准。
+
+## 安装 Codex
 
 <SystemContent system="windows">
 
-### 使用 WSL2 安装
+### Windows
 
-Windows 用户建议在 WSL2 中运行 Codex。这样可以使用 Linux 原生开发工具，并减少 Windows 与 Unix 命令、权限和路径之间的差异。
+可以从 [Codex 官方页面](https://openai.com/zh-Hans-CN/codex/)安装 Codex Desktop。
 
-首先以管理员身份打开 PowerShell 或 Windows Terminal，安装 WSL：
+如果主要使用命令行，推荐在 WSL2 中安装 Codex CLI。以管理员身份打开 PowerShell 或 Windows Terminal：
 
 ```powershell
 wsl --install
 ```
 
-安装完成后重启电脑，打开 Ubuntu，并完成 Linux 用户名和密码设置。
-
-然后在 WSL 终端中安装 Codex：
+安装完成并重启电脑后，打开 Ubuntu，在 WSL 终端中运行：
 
 ```bash
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
-```
-
-检查安装结果：
-
-```bash
 codex --version
 ```
 
-建议将项目放在 WSL 的 Linux 主目录下，例如 `~/code`，不要放在 `/mnt/c` 下，以获得更好的文件读写和权限兼容性。
-
-```bash
-mkdir -p ~/code
-cd ~/code
-```
-
-> WSL1 已不再受新版 Codex 支持，请使用 WSL2。
+后续文档中以 `~/.codex` 开头的路径，均指 WSL 用户目录中的路径，而不是 Windows 用户目录。
 
 </SystemContent>
 
 <SystemContent system="macos">
 
-### 在 macOS 中安装
+### macOS
 
-打开 Terminal，运行官方安装脚本：
+打开 Terminal，运行：
 
 ```bash
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
+codex --version
 ```
 
 也可以使用 Homebrew：
@@ -61,107 +70,274 @@ curl -fsSL https://chatgpt.com/codex/install.sh | sh
 brew install --cask codex
 ```
 
-检查安装结果：
-
-```bash
-codex --version
-```
+Codex Desktop 可以从 [Codex 官方页面](https://openai.com/zh-Hans-CN/codex/)安装。
 
 </SystemContent>
 
 <SystemContent system="linux">
 
-### 在 Linux 中安装
+### Linux
 
-打开终端，运行官方安装脚本：
+打开终端，运行：
 
 ```bash
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
-```
-
-检查安装结果：
-
-```bash
 codex --version
 ```
 
+Linux 用户请使用 Codex CLI。
+
 </SystemContent>
 
-## 配置连接
+能够正常显示 Codex 版本号，即表示安装完成。
 
-按照 SurplusToken 平台提供的接入地址和密钥配置 Codex。请使用环境变量或客户端配置文件保存密钥，不要把密钥写入项目源码。
+## 找到配置目录
+
+Codex 主要读取两个文件：
+
+| 运行环境       | 主配置                             | API Key                          |
+| -------------- | ---------------------------------- | -------------------------------- |
+| Windows 原生   | `%USERPROFILE%\.codex\config.toml` | `%USERPROFILE%\.codex\auth.json` |
+| Windows + WSL2 | `~/.codex/config.toml`             | `~/.codex/auth.json`             |
+| macOS          | `~/.codex/config.toml`             | `~/.codex/auth.json`             |
+| Linux          | `~/.codex/config.toml`             | `~/.codex/auth.json`             |
 
 <SystemContent system="windows">
 
-Windows 流程中的 Codex 运行在 WSL 内，因此请在 WSL 终端设置 Linux 环境变量：
+使用 WSL2 时，请在 WSL 终端创建配置目录：
 
 ```bash
-export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+mkdir -p ~/.codex
+chmod 700 ~/.codex
 ```
 
-需要永久保存时，将环境变量加入 `~/.bashrc`：
+如果使用原生 Windows 环境，可以按 `Win + R`，输入：
 
-```bash
-echo 'export OPENAI_API_KEY="你的 SurplusToken API 密钥"' >> ~/.bashrc
-source ~/.bashrc
+```text
+%USERPROFILE%\.codex
 ```
+
+目录不存在时，请先创建 `.codex` 文件夹。
 
 </SystemContent>
 
 <SystemContent system="macos">
 
-在 Terminal 中设置环境变量：
+在 Terminal 中运行：
 
 ```bash
-export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+mkdir -p ~/.codex
+chmod 700 ~/.codex
 ```
-
-需要永久保存时，将环境变量加入 `~/.zshrc`。
 
 </SystemContent>
 
 <SystemContent system="linux">
 
-在 Shell 中设置环境变量：
+在终端中运行：
 
 ```bash
-export OPENAI_API_KEY="你的 SurplusToken API 密钥"
+mkdir -p ~/.codex
+chmod 700 ~/.codex
 ```
-
-需要永久保存时，根据使用的 Shell 将环境变量加入 `~/.bashrc` 或 `~/.zshrc`。
 
 </SystemContent>
 
-## 启动 Codex
+## 配置 `config.toml`
 
-进入项目目录后运行：
+打开 `config.toml`，写入以下内容：
 
-<SystemCommand windows="codex" macos="codex" linux="codex" />
+```toml
+model_provider = "surplustoken"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+disable_response_storage = true
 
-首次启动时，按照终端提示完成登录或鉴权。
+[model_providers.surplustoken]
+name = "SurplusToken"
+base_url = "https://surplustoken.com/v1"
+wire_api = "responses"
+requires_openai_auth = true
+```
+
+以上示例已经设置好模型与推理强度，只需按后文配置 API Key 即可使用。
+
+:::info
+`base_url` 应填写到 `/v1`，不要写成 `/v1/responses`。Codex 会自动拼接 Responses API 路径。
+
+如果使用平台提供的校内专用地址，只替换 `base_url` 的值，其他字段保持不变。
+:::
+
+:::tip 配置放置位置
+`model_provider`、`model`、`model_reasoning_effort` 和 `disable_response_storage` 不必占据文件的物理前四行，但必须放在文件中第一个 `[表名]` 之前；本例的第一个表是 `[model_providers.surplustoken]`。
+
+这是因为 TOML 从 `[model_providers.surplustoken]` 开始进入该表；写在它后面的普通字段会被当成该表的成员，而不再是 Codex 的顶层配置。上述四个顶层字段彼此之间的顺序没有要求。
+:::
+
+Windows + WSL2 用户首次使用时，还可以在文件中第一个 `[表名]` 之前加入：
+
+```toml
+windows_wsl_setup_acknowledged = true
+```
+
+## 保存 API Key
+
+创建 `auth.json`，写入：
+
+```json
+{
+  "OPENAI_API_KEY": "<SURPLUSTOKEN_API_KEY>"
+}
+```
+
+将 `<SURPLUSTOKEN_API_KEY>` 替换为你在平台创建的完整密钥。
+
+macOS、Linux 和 WSL 用户建议限制文件权限：
+
+```bash
+chmod 600 ~/.codex/auth.json
+```
+
+:::warning
+`auth.json` 必须是合法 JSON：不能包含注释，最后一个字段后不能有逗号。
+:::
+
+也可以让 Codex 从标准输入保存密钥，避免密钥进入命令历史：
+
+```bash
+read -rsp "SurplusToken API Key: " SURPLUSTOKEN_API_KEY
+echo
+printf '%s' "$SURPLUSTOKEN_API_KEY" | codex login --with-api-key
+unset SURPLUSTOKEN_API_KEY
+```
+
+## 验证配置
+
+进入一个测试目录后启动 Codex：
+
+```bash
+mkdir -p ~/codex-test
+cd ~/codex-test
+codex
+```
+
+发送一个不会修改文件的测试请求：
+
+```text
+只回复“连接成功”，不要创建或修改任何文件。
+```
+
+配置成功应同时满足：
+
+- Codex 能正常返回内容。
+- 没有出现鉴权或模型错误。
+- SurplusToken 的用量记录中能看到本次请求。
 
 ## Codex Desktop
 
+Codex Desktop 使用哪个 `.codex` 目录，取决于当前选择的 Agent Environment：
+
 <SystemContent system="windows">
 
-Windows 可以安装 Codex Desktop。使用 WSL 项目时，在应用设置中将 Agent Environment 配置为 Windows Subsystem for Linux，并选择实际用于开发的 WSL2 发行版。
-
-打开项目时，优先选择 `\\wsl$\Ubuntu\home\<用户名>\code` 下的目录。
+- 使用原生 Windows 环境时，编辑 `%USERPROFILE%\.codex`。
+- 使用 WSL 环境时，编辑对应 WSL 发行版中的 `~/.codex`。
+- 打开 WSL 项目时，建议将项目放在 `~/code` 等 Linux 目录中。
 
 </SystemContent>
 
 <SystemContent system="macos">
 
-macOS 可以直接安装并运行 Codex Desktop。打开应用后选择项目目录，再按照 SurplusToken 平台提供的信息配置接入地址和 API 密钥。
+macOS 使用当前用户的 `~/.codex`。
 
 </SystemContent>
 
 <SystemContent system="linux">
 
-Linux 用户请使用 Codex CLI。Codex Desktop 当前面向 Windows 和 macOS 提供。
+Linux 当前使用 Codex CLI，不需要配置 Desktop。
 
 </SystemContent>
 
-:::tip
-右上角的系统选择会同步更新本页所有系统专属内容，并在刷新和页面跳转后保留。
+修改配置后，请完全退出并重新打开 Codex Desktop。
+
+## 使用 Cockpit Tools 切换账号
+
+如果以前使用过其他中转服务或 OpenAI 订阅，可以使用 Cockpit Tools 保存多个 Codex 配置并在它们之间切换。
+
+:::warning
+Cockpit Tools 是第三方工具，不是 OpenAI 或 SurplusToken 官方组件。安装和使用前请自行确认来源可信，并注意它能够接触你的 API Key。
 :::
+
+1. 打开 Cockpit Tools。
+2. 进入 **Codex → 账号总览**。
+3. 点击 **添加账号**，选择 **API Key**。
+4. 供应商选择 **自定义**。
+5. 供应商名称填写 `SurplusToken`。
+6. API Key 填写平台创建的密钥。
+7. 基础地址填写：
+
+   ```text
+   https://surplustoken.com/v1
+   ```
+
+8. 保存账号，并将它加入 Cockpit Tools 的 **API 服务**。
+9. 监听范围选择 **仅本机**，启动本机 API 服务。
+10. 选中 SurplusToken 账号，点击 **运行**或**切换 API**。
+
+Cockpit Tools 可能使用类似下面的本机转发地址：
+
+```text
+http://localhost:11918/v1
+```
+
+这个地址是 Cockpit Tools 的本机代理，不是 SurplusToken 公网地址。不要将监听范围改成 `0.0.0.0`，也不要把本机端口暴露到局域网或公网。
+
+## 常见问题
+
+### 返回 401
+
+通常表示 API Key 填写错误、已撤销或已经过期：
+
+- 重新复制完整密钥，检查前后是否有空格。
+- 检查 `auth.json` 是否为合法 JSON。
+- 确认修改的是 Codex 当前环境实际读取的 `.codex` 目录。
+
+### 返回 404 或提示模型不存在
+
+依次检查：
+
+- `base_url` 是否以 `/v1` 结尾。
+- 是否错误写成了 `/v1/responses`。
+- `model` 是否与平台提供的模型 ID 完全一致。
+- 当前密钥绑定的分组是否支持该模型。
+
+### 返回 429
+
+可能是请求频率、并发、余额、订阅额度或上游账号受限。请查看平台中的密钥状态、余额和用量记录，稍后重试。
+
+### CLI 可用，但 Desktop 不可用
+
+检查 Desktop 当前选择的是原生 Windows 还是 WSL 环境，并确认修改的是对应环境的配置目录。修改后完全退出并重启 Desktop。
+
+### 修改配置后没有生效
+
+- 完全退出 Codex CLI 或 Desktop 后重新启动。
+- 检查文件名是否确实为 `config.toml` 和 `auth.json`。
+- Windows 用户确认文件没有被保存成 `config.toml.txt`。
+- 检查 TOML 顶层字段是否被误写进 `[model_providers.surplustoken]` 表格。
+
+### Cockpit Tools 切换后仍使用旧账号
+
+- 确认目标账号已加入 **API 服务**。
+- 确认本机 API 服务正在运行。
+- 再次点击 **运行**或**切换 API**。
+- 完全退出并重新启动 Codex。
+- 检查本机转发端口是否被其他程序占用。
+
+## 撤销或更换密钥
+
+怀疑 API Key 泄露时：
+
+1. 立即在 SurplusToken 平台撤销旧密钥。
+2. 创建新密钥。
+3. 更新 `auth.json` 或 Cockpit Tools 中保存的密钥。
+4. 重启 Codex，并重新发起测试请求。
