@@ -3,12 +3,10 @@
   "name": "surplusai-docs",
   "compatibility_date": "2026-07-16",
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "assets": {
-    "directory": "doc_build"
+    "directory": "doc_build",
   },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "compatibility_flags": ["nodejs_compat"],
 }

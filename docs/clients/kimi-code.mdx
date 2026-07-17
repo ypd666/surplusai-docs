@@ -1,0 +1,282 @@
+import { SystemContent, SystemSelector } from '@rspress/core/theme';
+
+# Kimi Code 接入
+
+本教程说明如何安装 Kimi Code CLI，并通过 `config.toml` 使用 SurplusToken 提供的 Kimi 模型。
+
+<SystemSelector variant="content" />
+
+:::warning API Key 安全
+配置文件会以明文保存 API Key。不要把 `config.toml` 上传到代码仓库、发送给他人，或在截图和日志中展示完整密钥。
+:::
+
+## 开始前准备
+
+开始前，请先完成以下操作：
+
+1. 登录 [SurplusToken](https://surplustoken.com)。
+2. 在平台中[创建 API 密钥](/platform/create-api-key)。
+3. 确认密钥绑定的分组支持 `k3`、`kimi-for-coding` 或 `kimi-for-coding-highspeed`。
+
+本页安装步骤依据 [Kimi Code 官方入门文档](https://www.kimi.com/code/docs/kimi-code-cli/guides/getting-started.html)整理。
+
+## 安装 Kimi Code CLI
+
+官方安装脚本不要求预先安装 Node.js，并会下载最新版本、校验文件，然后把 `kimi` 命令加入 `PATH`。
+
+<SystemContent system="windows">
+
+### Windows
+
+先安装 [Git for Windows](https://git-scm.com/download/win)。Kimi Code CLI 会使用 Git for Windows 附带的 Git Bash 作为 Shell 环境。
+
+随后打开 PowerShell，运行官方安装脚本：
+
+```powershell
+irm https://code.kimi.com/kimi-code/install.ps1 | iex
+```
+
+关闭并重新打开 PowerShell，然后检查版本：
+
+```powershell
+kimi --version
+```
+
+如果 Git Bash 安装在非默认目录，需要将环境变量 `KIMI_SHELL_PATH` 设置为 `bash.exe` 的完整路径。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+### macOS
+
+打开 Terminal，运行官方安装脚本：
+
+```bash
+curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash
+```
+
+重新打开 Terminal，然后检查版本：
+
+```bash
+kimi --version
+```
+
+macOS 首次运行可能会因系统安全检查而稍慢。
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+### Linux
+
+打开终端，运行官方安装脚本：
+
+```bash
+curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash
+```
+
+重新打开终端，然后检查版本：
+
+```bash
+kimi --version
+```
+
+</SystemContent>
+
+如果已经安装 Node.js `22.19.0` 或更高版本，也可以通过 npm 安装：
+
+```bash
+npm install -g @moonshot-ai/kimi-code
+kimi --version
+```
+
+## 找到配置文件
+
+Kimi Code CLI 的用户级配置文件是 `config.toml`。文件不存在时，可以手动创建。
+
+| 操作系统 | 默认路径                                                                                  |
+| -------- | ----------------------------------------------------------------------------------------- |
+| Windows  | `%USERPROFILE%\.kimi-code\config.toml`，通常是 `C:\Users\<用户名>\.kimi-code\config.toml` |
+| macOS    | `/Users/<用户名>/.kimi-code/config.toml`                                                  |
+| Linux    | `/home/<用户名>/.kimi-code/config.toml`                                                   |
+
+<SystemContent system="windows">
+
+在 PowerShell 中创建配置目录，并用记事本打开配置文件：
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.kimi-code" | Out-Null
+notepad "$HOME\.kimi-code\config.toml"
+```
+
+记事本询问是否创建文件时，选择确认。保存时确保文件名是 `config.toml`，而不是 `config.toml.txt`。
+
+</SystemContent>
+
+<SystemContent system="macos">
+
+在 Terminal 中创建配置目录，并用文本编辑器打开配置文件：
+
+```bash
+mkdir -p ~/.kimi-code
+open -e ~/.kimi-code/config.toml
+```
+
+</SystemContent>
+
+<SystemContent system="linux">
+
+在终端中创建配置目录，并用文本编辑器打开配置文件：
+
+```bash
+mkdir -p ~/.kimi-code
+nano ~/.kimi-code/config.toml
+```
+
+</SystemContent>
+
+如果设置过 `KIMI_CODE_HOME`，配置文件应放在 `$KIMI_CODE_HOME/config.toml`，而不是上述默认目录。
+
+## 配置 SurplusToken
+
+将下面的完整内容写入 `config.toml`。把 `填写你的 SurplusToken API Key` 替换为平台中创建的完整 API Key，保留两侧英文双引号。
+
+```toml
+default_plan_mode = false
+merge_all_available_skills = false
+default_model = "surplustoken/k3"
+
+[loop_control]
+max_retries_per_step = 3
+reserved_context_size = 50000
+
+[background]
+max_running_tasks = 4
+keep_alive_on_exit = false
+
+[providers."surplustoken-kimi"]
+type = "kimi"
+base_url = "https://surplustoken.com/v1"
+api_key = "填写你的 SurplusToken API Key"
+
+[models."surplustoken/kimi-for-coding"]
+provider = "surplustoken-kimi"
+model = "kimi-for-coding"
+max_context_size = 262144
+capabilities = [
+  "thinking",
+  "always_thinking",
+  "image_in",
+  "video_in",
+  "tool_use",
+]
+display_name = "K2.7 Coding"
+
+[models."surplustoken/kimi-for-coding-highspeed"]
+provider = "surplustoken-kimi"
+model = "kimi-for-coding-highspeed"
+max_context_size = 262144
+capabilities = [
+  "thinking",
+  "always_thinking",
+  "image_in",
+  "video_in",
+  "tool_use",
+]
+display_name = "K2.7 Coding Highspeed"
+
+[models."surplustoken/k3"]
+provider = "surplustoken-kimi"
+model = "k3"
+max_context_size = 1048576
+capabilities = [
+  "thinking",
+  "always_thinking",
+  "image_in",
+  "video_in",
+  "tool_use",
+]
+display_name = "K3"
+support_efforts = ["max"]
+default_effort = "max"
+
+[thinking]
+enabled = true
+effort = "max"
+keep = "all"
+```
+
+此配置注册三个可用模型，并默认选择 `surplustoken/k3`：
+
+| 配置别名                                 | 实际模型                    | 上下文长度       | 说明                            |
+| ---------------------------------------- | --------------------------- | ---------------- | ------------------------------- |
+| `surplustoken/k3`                        | `k3`                        | 1,048,576 tokens | 默认模型，Thinking 强度为 `max` |
+| `surplustoken/kimi-for-coding`           | `kimi-for-coding`           | 262,144 tokens   | K2.7 Coding 标准版              |
+| `surplustoken/kimi-for-coding-highspeed` | `kimi-for-coding-highspeed` | 262,144 tokens   | K2.7 Coding 高速版              |
+
+:::info
+`base_url` 填写到 `/v1` 即可。Kimi Code CLI 会根据 `type = "kimi"` 使用对应的 OpenAI 兼容协议，不要在地址后继续添加具体接口路径。
+:::
+
+## 检查配置并启动
+
+保存文件后，先让 Kimi Code CLI 检查 `config.toml`：
+
+```bash
+kimi doctor config
+```
+
+检查通过后，进入需要处理的项目目录并启动：
+
+```bash
+cd /path/to/your/project
+kimi
+```
+
+启动后可以输入 `/model` 查看三个 SurplusToken 模型。默认应选中 `K3`。
+
+修改 `config.toml` 后，可以在 Kimi Code 中输入 `/reload` 重新加载配置，或完全退出后再次运行 `kimi`。
+
+## 常见问题
+
+### 找不到 `kimi` 命令
+
+安装完成后关闭并重新打开终端，再运行 `kimi --version`。macOS 或 Linux 仍然找不到命令时，可以重新加载 Shell 配置：
+
+```bash
+source ~/.bashrc
+```
+
+使用 Zsh 时改为：
+
+```bash
+source ~/.zshrc
+```
+
+### Windows 提示找不到 Git Bash
+
+确认已经安装 Git for Windows。如果安装在自定义目录，将 `KIMI_SHELL_PATH` 设置为实际的 `bash.exe` 路径后重新打开 PowerShell。
+
+### `config.toml` 无法解析
+
+运行 `kimi doctor config` 查看具体位置，并检查：
+
+- 文件是否使用英文双引号和英文标点。
+- API Key 两侧的双引号是否完整。
+- Windows 文件名是否被保存成 `config.toml.txt`。
+- 表名中的模型别名是否保留了双引号。
+
+### 返回 401 或鉴权失败
+
+重新复制 SurplusToken API Key，确认没有多余空格，并检查密钥是否已被撤销或过期。API Key 必须写在 `[providers."surplustoken-kimi"]` 下，Kimi Code CLI 不会自动读取普通的 Shell API Key 环境变量。
+
+### 提示模型不存在或不可用
+
+确认当前 API Key 绑定的分组支持配置中的模型 ID。模型 ID 必须保持为 `k3`、`kimi-for-coding` 或 `kimi-for-coding-highspeed`。
+
+### 修改配置后没有生效
+
+运行 `kimi doctor config` 确认 CLI 实际读取的配置位置。如果设置了 `KIMI_CODE_HOME`，需要修改该目录中的 `config.toml`。随后输入 `/reload`，或退出并重新启动 Kimi Code。
+
+更多配置项和目录规则参见 Kimi Code 官方的[配置文件](https://www.kimi.com/code/docs/kimi-code-cli/configuration/config-files.html)与[数据路径](https://www.kimi.com/code/docs/kimi-code-cli/configuration/data-locations.html)文档。

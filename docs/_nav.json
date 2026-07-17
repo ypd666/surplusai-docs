@@ -2,6 +2,11 @@
   {
     "text": "文档",
     "link": "/start/introduction",
-    "activeMatch": "/"
+    "activeMatch": "^/$|^/(start|platform|clients|tools|faq)/"
+  },
+  {
+    "text": "贡献文档",
+    "link": "/contribute/",
+    "activeMatch": "/contribute/"
   }
 ]

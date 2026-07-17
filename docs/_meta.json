@@ -23,5 +23,10 @@
     "type": "dir-section-header",
     "name": "faq",
     "label": "常见问题"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "contribute",
+    "label": "文档贡献"
   }
 ]

@@ -6,6 +6,11 @@
   },
   {
     "type": "file",
+    "name": "kimi-code",
+    "label": "Kimi Code 接入"
+  },
+  {
+    "type": "file",
     "name": "opencode",
     "label": "OpenCode 接入"
   }
