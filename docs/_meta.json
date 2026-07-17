@@ -11,6 +11,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "groups",
+    "label": "API 密钥分组"
+  },
+  {
+    "type": "dir-section-header",
     "name": "clients",
     "label": "客户端接入"
   },

@@ -3,5 +3,10 @@
     "type": "file",
     "name": "index",
     "label": "提交文档"
+  },
+  {
+    "type": "file",
+    "name": "image-guidelines",
+    "label": "图片规范"
   }
 ]

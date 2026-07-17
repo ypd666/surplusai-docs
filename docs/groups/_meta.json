@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "index",
+    "label": "分组说明"
+  },
+  {
+    "type": "file",
+    "name": "plus-team",
+    "label": "plus/team"
+  }
+]

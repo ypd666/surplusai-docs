@@ -239,6 +239,10 @@ Linux 可以直接在 Shell 中安装。
 - 不要在示例中写入真实 API 密钥、密码或账号凭证。
 - 外部产品的安装方式可能变化，修改前应核对其官方文档。
 
+## 图片规范
+
+正文操作截图统一使用 HTML `img` 标签，并设置 `width="720"`。图片格式、命名、存放路径、替代文本和敏感信息检查详见 [`docs/contribute/image-guidelines.md`](./docs/contribute/image-guidelines.md)。
+
 ## 本地验证
 
 安装依赖：
